@@ -67,7 +67,10 @@
      		 	headers: {
       				'Content-Type': 'text/plain;charset=utf-8'
       			},
-      			body: JSON.stringify({ action: 'getAcaraConf' })
+      			body: JSON.stringify({ 
+					action: 'getAcaraConf',
+					acara: noAcara
+				})
     		});
 
     		const data = await res.json();
