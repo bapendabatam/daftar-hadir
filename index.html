@@ -78,7 +78,9 @@
 	}
 
 	async function initDashboard() {
-		const acara = await setAcara();
+		const params = new URLSearchParams(window.location.search);
+		const noAcara = params.get(acara);
+		const acara = await setAcara(noAcara);
 		console.log("Radius: " + acara.radius);
 	}
 
