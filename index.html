@@ -58,10 +58,25 @@
       status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Memeriksa lokasi...</div></div>`;
       
       // Ambil konfigurasi acara
-      fetch("https://script.google.com/macros/s/AKfycbxCRYG03KUFyjTtfklk39f24HtfefWdmKGMgxGI9nVE1CfPH7eKB7F8l9tVCWHobUin/exec?action=getAcaraConf")
-          .then(res => res.json())
-          .then(showAcara)
-          .catch(err => console.error("Gagal memuat acara:", err));
+     async function getAcaraConf() {
+  		const url = 'https://script.google.com/macros/s/AKfycbxCRYG03KUFyjTtfklk39f24HtfefWdmKGMgxGI9nVE1CfPH7eKB7F8l9tVCWHobUin/exec';
+
+  		try {
+   			 const res = await fetch(url, {
+     		 	method: 'POST',
+     		 	headers: {
+      				'Content-Type': 'text/plain;charset=utf-8'
+      			},
+      			body: JSON.stringify({ action: 'getAcaraConf' })
+    		});
+
+    		const data = await res.json();
+    		console.log('getAcaraConf:', data);
+   	 		return data;
+  		} catch (err) {
+    		console.error('Error getAcaraConf:', err);
+  		}
+	}
 
       // === Dropdown Instansi ===
       function toggleDropdown(event) {
