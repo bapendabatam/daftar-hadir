@@ -58,7 +58,10 @@
       status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Memeriksa lokasi...</div></div>`;
       
       // Ambil konfigurasi acara
-      google.script.run.withSuccessHandler(showAcara).getAcaraConf();
+      fetch("https://script.google.com/macros/s/AKfycbxYOUR_DEPLOY_ID/exec?action=getAcaraConf")
+          .then(res => res.json())
+          .then(showAcara)
+          .catch(err => console.error("Gagal memuat acara:", err));
 
       // === Dropdown Instansi ===
       function toggleDropdown(event) {
