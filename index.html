@@ -54,12 +54,12 @@
 	// -- Tampil Peta --
 	const status = document.getElementById("status");
 	const form = document.getElementById("form-daftar-hadir");
-
+	const URL_APP = 'https://script.google.com/macros/s/AKfycbxCRYG03KUFyjTtfklk39f24HtfefWdmKGMgxGI9nVE1CfPH7eKB7F8l9tVCWHobUin/exec';
 	status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Memeriksa lokasi...</div></div>`;
       
 	// Ambil konfigurasi acara
 	async function setAcara() {
-  		const url = 'https://script.google.com/macros/s/AKfycbxCRYG03KUFyjTtfklk39f24HtfefWdmKGMgxGI9nVE1CfPH7eKB7F8l9tVCWHobUin/exec';
+  		const url = URL_APP;
 
   		try {
    			 const res = await fetch(url, {
