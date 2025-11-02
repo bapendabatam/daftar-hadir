@@ -58,7 +58,7 @@
       status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Memeriksa lokasi...</div></div>`;
       
       // Ambil konfigurasi acara
-      fetch("https://script.google.com/macros/s/AKfycbxYOUR_DEPLOY_ID/exec?action=getAcaraConf")
+      fetch("https://script.google.com/macros/s/AKfycbxCRYG03KUFyjTtfklk39f24HtfefWdmKGMgxGI9nVE1CfPH7eKB7F8l9tVCWHobUin/exec/exec?action=getAcaraConf")
           .then(res => res.json())
           .then(showAcara)
           .catch(err => console.error("Gagal memuat acara:", err));
