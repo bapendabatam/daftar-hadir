@@ -71,7 +71,6 @@
     		});
 
     		const data = await res.json();
-    		console.log('getAcaraConf:', data);
    	 		return data;
   		} catch (err) {
     		console.error('Error getAcaraConf:', err);
@@ -80,7 +79,7 @@
 
 	async function initDashboard() {
 		const acara = await setAcara();
-		console.log('Konfig acara:', acara);
+		console.log("Radius: " + acara.radius);
 	}
 
 	initDashboard();
