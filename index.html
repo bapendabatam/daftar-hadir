@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <meta charset="UTF-8" />
+	  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256‑p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+      integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
+      crossorigin="anonymous" referrerpolicy="no-referrer">
+	  <title>Daftar Hadir</title>
+
+    <?!= include('style'); ?>
+  </head>
+  <body>
+    <div id="wrapper">
+      <div id="status"></div>
+      <div id="judul">
+        <h1>Daftar Hadir</h1>
+      </div>
+      <div id="map"></div>
+      <form id="form-daftar-hadir">
+        <div class="input-form">
+          <label>Nama Lengkap</label>
+          <input class="box-input" type="text" name="nama" required/>
+        </div>
+
+        <div class="input-form dropdown">
+          <label>Instansi/OPD</label>
+          <div onclick="toggleDropdown(event)" class="dropdownBtn" id="instansiButton">
+            <div id="instansiText">Pilih Instansi/OPD</div><i id="dropdownIcon" class="fa-solid fa-caret-down dropdown-icon"></i>
+          </div>
+          <div id="dropdownInstansi" class="dropdown-content">
+            <input type="text" placeholder="Cari..." id="inputInstansi" onkeyup="filterInstansi()">
+            <div id="instansiList"></div>
+          </div>
+        </div>
+
+        <div class="input-form">
+          <label>Jabatan</label>
+          <input class="box-input" type="text" name="jabatan" required/>
+        </div>
+
+        <!-- Input hidden untuk dikirim -->
+        <input type="hidden" name="instansi" id="instansiHidden" required>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+        crossorigin=""></script>
+    <script>
+      // -- Tampil Peta --
+      const status = document.getElementById("status");
+      const form = document.getElementById("form-daftar-hadir");
+
+      status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Memeriksa lokasi...</div></div>`;
+      
+      // Ambil konfigurasi acara
+      google.script.run.withSuccessHandler(showAcara).getAcaraConf();
+
+      // === Dropdown Instansi ===
+      function toggleDropdown(event) {
+        if (event) event.preventDefault();
+
+        const dropdown = document.getElementById("dropdownInstansi");
+        const icon = document.getElementById("dropdownIcon");
+
+        dropdown.classList.toggle("show");
+
+        if (dropdown.classList.contains("show")) {
+          icon.classList.replace("fa-caret-down", "fa-caret-up");
+        } else {
+          icon.classList.replace("fa-caret-up", "fa-caret-down");
+        }
+
+        document.getElementById("inputInstansi").focus();
+      }
+
+      function filterInstansi() {
+        const input = document.getElementById("inputInstansi");
+        const filter = input.value.toUpperCase();
+        const items = document.getElementsByClassName("dropdown-item");
+
+        for (let i = 0; i < items.length; i++) {
+          const txtValue = items[i].textContent || items[i].innerText;
+          items[i].style.display = txtValue.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+        }
+      }
+
+      document.addEventListener("click", function (e) {
+        // Jika klik di luar dropdown, tutup dropdown
+        if (!e.target.closest(".dropdown")) {
+          const dropdown = document.getElementById("dropdownInstansi");
+          const icon = document.getElementById("dropdownIcon");
+          if (dropdown && icon) {
+            dropdown.classList.remove("show");
+            icon.classList.replace("fa-caret-up", "fa-caret-down");
+          }
+        }
+
+        // Jika klik pada item instansi
+        if (e.target.classList.contains("dropdown-item")) {
+          pilihInstansi(e.target.textContent);
+        }
+      });
+
+      function pilihInstansi(namaInstansi) {
+        const instansiButton = document.getElementById("instansiButton");
+        const instansiHidden = document.getElementById("instansiHidden");
+        const dropdown = document.getElementById("dropdownInstansi");
+        const icon = document.getElementById("dropdownIcon");
+
+        // Ganti teks tapi pertahankan ikon
+        instansiButton.innerHTML = `${namaInstansi} <i id="dropdownIcon" class="fa-solid fa-caret-down"></i>`;
+        instansiHidden.value = namaInstansi;
+
+        if (dropdown && icon) {
+          dropdown.classList.remove("show");
+          icon.classList.replace("fa-caret-up", "fa-caret-down");
+        }
+      }
+
+      function showAcara(cfg) {
+        const acrLatLng = cfg.acrLatLng;
+        const radius = cfg.radius;
+
+        // 19 = bangunan, 15 = kota, 0 = seluruh dunia.
+        zoom = 17;
+
+        // Inisiasi map
+        const  map = L.map('map').setView(acrLatLng, zoom);
+
+        // Tile layer dari OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          maxZoom: 19,
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>' 
+        }).addTo(map);
+
+        // Tambahkan marker lokasi acara
+        const marker = L.marker(acrLatLng).addTo(map)
+            .bindPopup('<b>Lokasi Acara</b>')
+            .openPopup();
+
+        L.circle(acrLatLng, {
+          radius: radius,
+          color: 'blue',
+          fillColor: '#3f9df5',
+          fillOpacity: 0.2
+        }).addTo(map)
+          .bindPopup(`Radius ${radius} meter`);
+          
+        // Deteksi lokasi pengguna
+        map.locate({
+          setView: true,
+          maxZoom: 17,
+          enableHighAccuracy: true
+        });
+
+        // Custom user pin
+        const userPin = L.divIcon({
+          html: '<i class="fa-solid fa-location-dot user-pin"></i>',
+          iconSize: [32, 32],
+          className: 'user-marker'
+        });
+
+        // Jika lokasi tidak ditemukan
+        map.on('locationerror', (e) => {
+          status.innerHTML = `<div class="warning">Gagal mendeteksi lokasi: ${e.message}</div>`;
+
+          throw new Error("Proses dihentikan karena gagal deteksi lokasi!");
+        });
+
+        // Jika lokasi ditemukan
+        map.on('locationfound', (e) => {
+          latlngUser = e.latlng;
+          latUser = e.latlng.lat;
+          lngUser = e.latlng.lng;
+
+          // Marker posisi pengguna
+          L.marker(latlngUser, { icon:userPin })
+              .addTo(map)
+            .bindPopup('Lokasi anda')
+            .openPopup();
+            
+          // Hitung jarak dalam meter
+          canSubmit = false;  // default
+
+          status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Menghitung jarak...</div></div>`;
+
+          google.script.run.withSuccessHandler(getJarak).cekJarak(latUser, lngUser);
+
+          function getJarak(result) {
+            canSubmit = result.canSubmit;
+
+            if(!canSubmit) {
+              status.innerHTML = `<div class="warning">Anda berada diluar area!</div>`;
+              return;
+            } else {
+              form.style.display = 'flex';
+              status.innerHTML = '';
+
+              tampilForm();
+            } 
+          }
+        });
+      }
+
+      function tampilForm() {
+        // Tampil pilihan Instansi/OPD
+        status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Mengambil daftar Instansi/OPD...</div></div>`;
+
+        // Ambil list instansi
+        google.script.run.withSuccessHandler(showInstansi).getInstansi();
+
+        function showInstansi(data) {
+          const listDiv = document.getElementById("instansiList");
+          listDiv.innerHTML = ""; // kosongkan dulu
+
+          Object.keys(data).forEach((kategori) => {
+            const list = data[kategori];
+
+            // Skip kosong
+            if (!Array.isArray(list) || list.length === 0) return;
+
+            // Judul kategori
+            //const header = document.createElement("div");
+            //header.className = "dropdown-header";
+            //header.textContent = kategori.toUpperCase();
+            //listDiv.appendChild(header);
+
+            // Tambah item per baris
+            list.forEach((row) => {
+              const item = document.createElement("div");
+              item.className = "dropdown-item";
+              item.textContent = row;
+              listDiv.appendChild(item);
+            })
+          });
+
+          status.innerHTML = "";
+        }    
+      }
+      
+      // Submit
+      form.addEventListener("submit", function(e) {
+        e.preventDefault();
+        
+        const data = {
+          nama: form.nama.value,
+          instansi: form.instansi.value,
+          jabatan: form.jabatan.value,
+          lat: latUser,
+          lng: lngUser
+        };
+
+        // Kirim
+        status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Menyimpan Data Presensi...</div></div>`;
+
+        google.script.run
+            .withSuccessHandler((res) => {
+              if (res.status === "success") {
+                status.innerHTML = `<div class="success">Presensi Berhasil disimpan!</div>`;
+              } else {
+                status.innerHTML = `<div class="warning">${res.message}</div>`;
+              }
+            })
+            .withFailureHandler((err) => {
+              status.innerHTML = `<div class="warning">Gagal: ${res.message}</div>`;
+            })
+            .simpanPresensi(data);
+      });
+    </script>
+  </body>
+</html>
