@@ -1,94 +1,70 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-	  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+	<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
       integrity="sha256‑p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
       crossorigin=""/>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css"
       integrity="sha512-DxV+EoADOkOygM4IR9yXP8Sb2qwgidEmeqAEmDKIOfPRQZOWbXCzLC6vjbZyy0vPisbH2SyW27+ddLVCN+OMzQ=="
       crossorigin="anonymous" referrerpolicy="no-referrer">
-	  <title>Daftar Hadir</title>
-    <link rel="stylesheet" href="style.css">
-  </head>
-  <body>
-    <div id="wrapper">
-      <div id="status"></div>
-      <div id="judul">
-        <h1>Daftar Hadir</h1>
-      </div>
-      <div id="map"></div>
-      <form id="form-daftar-hadir">
-        <div class="input-form">
-          <label>Nama Lengkap</label>
-          <input class="box-input" type="text" name="nama" required/>
-        </div>
+	<title>Daftar Hadir</title>
+	<link rel="stylesheet" href="style.css">
+	</head>
+	<body>
+	<div id="wrapper">
+		<div id="status"></div>
+		<div id="judul">
+			<h1>Daftar Hadir</h1>
+			<h2 id="namaAcara"></h2>
+		</div>
+		<div class="detail-wrapper">
+			<div class="detail-acara">
+				<div class="label">Lokasi:</div>
+				<div class="value" id="lokasi"></div>
+			</div>
+			<div class="detail-acara">
+				<div class="label">Tanggal:</div>
+				<div class="value" id="tanggal"></div>
+			</div>
+			<div class="detail-acara">
+				<div class="label">Jam Mulai:</div>
+				<div class="value" id="jam"></div>
+			</div>
+		</div>
+		<div id="map"></div>
+		<form id="form-daftar-hadir">
+			<div class="input-form">
+				<label>Nama Lengkap</label>
+				<input class="box-input" type="text" name="nama" required/>
+			</div>
 
-        <div class="input-form dropdown">
-          <label>Instansi/OPD</label>
-          <div onclick="toggleDropdown(event)" class="dropdownBtn" id="instansiButton">
-            <div id="instansiText">Pilih Instansi/OPD</div><i id="dropdownIcon" class="fa-solid fa-caret-down dropdown-icon"></i>
-          </div>
-          <div id="dropdownInstansi" class="dropdown-content">
-            <input type="text" placeholder="Cari..." id="inputInstansi" onkeyup="filterInstansi()">
-            <div id="instansiList"></div>
-          </div>
-        </div>
+			<div class="input-form dropdown">
+				<label>Instansi/OPD</label>
+				<div onclick="toggleDropdown(event)" class="dropdownBtn" id="instansiButton">
+					<div id="instansiText">Pilih Instansi/OPD</div><i id="dropdownIcon" class="fa-solid fa-caret-down dropdown-icon"></i>
+				</div>
+				<div id="dropdownInstansi" class="dropdown-content">
+					<input type="text" placeholder="Cari..." id="inputInstansi" onkeyup="filterInstansi()">
+					<div id="instansiList"></div>
+				</div>
+			</div>
 
-        <div class="input-form">
-          <label>Jabatan</label>
-          <input class="box-input" type="text" name="jabatan" required/>
-        </div>
+			<div class="input-form">
+				<label>Jabatan</label>
+				<input class="box-input" type="text" name="jabatan" required/>
+			</div>
 
-        <!-- Input hidden untuk dikirim -->
-        <input type="hidden" name="instansi" id="instansiHidden" required>
+			<!-- Input hidden untuk dikirim -->
+			<input type="hidden" name="instansi" id="instansiHidden" required>
 
-        <button type="submit">Submit</button>
-      </form>
-    </div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+			<button type="submit">Submit</button>
+		</form>
+	</div>
+	<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
         integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
         crossorigin=""></script>
-    <script>
-	// -- Tampil Peta --
-	const status = document.getElementById("status");
-	const form = document.getElementById("form-daftar-hadir");
-	const URL_APP = 'https://script.google.com/macros/s/AKfycbxCRYG03KUFyjTtfklk39f24HtfefWdmKGMgxGI9nVE1CfPH7eKB7F8l9tVCWHobUin/exec';
-	status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Memeriksa lokasi...</div></div>`;
-      
-	// Ambil konfigurasi acara
-	async function setAcara(noAcara) {
-  		const url = URL_APP;
-
-  		try {
-   			 const res = await fetch(url, {
-     		 	method: 'POST',
-     		 	headers: {
-      				'Content-Type': 'text/plain;charset=utf-8'
-      			},
-      			body: JSON.stringify({ 
-					action: 'getAcaraConf',
-					acara: noAcara
-				})
-    		});
-
-    		const data = await res.json();
-   	 		return data;
-  		} catch (err) {
-    		console.error('Error getAcaraConf:', err);
-  		}
-	}
-
-	async function initDashboard() {
-		const params = new URLSearchParams(window.location.search);
-		const noAcara = params.get('acara');
-		const acara = await setAcara(noAcara);
-		console.log("Acara: " + acara.nama);
-		console.log("Radius: " + acara.radius);
-	}
-
-	initDashboard();
-    </script>
-  </body>
+	<script src="form.js"></script>
+	</body>
 </html>
