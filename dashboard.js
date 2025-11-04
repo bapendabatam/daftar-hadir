@@ -5,7 +5,7 @@ const noAcara = params.get('acara'); // ambil noAcara dari URL
 
 const status = document.getElementById("status");
 const divJmlInst = document.getElementById("jml-instansi");
-const divProgress = document.getElementById("progress");
+const divProgressInstansi = document.getElementById("progress-instansi");
 
 let currentVersion = null;
 const ol = document.getElementById("instansi-blm-hadir");
@@ -14,9 +14,32 @@ ol.innerHTML = '';
 let jmlInstansi = 0;
 let jmlInstansiHadir = 0;
 
-status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Mengambil data...</div></div>`;
+// Ambil konfigurasi acara
+async function setAcara() {
+	status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Setup acara...</div></div>`;
+
+	try {
+		 const res = await fetch(URL_APP, {
+ 		 	method: 'POST',
+ 		 	headers: {
+  				'Content-Type': 'text/plain;charset=utf-8'
+  			},
+  			body: JSON.stringify({ 
+				action: 'getAcaraConf',
+				acara: noAcara
+			})
+		});
+
+		const data = await res.json();
+ 		return data;
+	} catch (err) {
+		console.error('Error getAcaraConf:', err);
+	}
+}
 
 async function getJmlInstansi() {
+	status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Mengambil Jumlah Instansi...</div></div>`;
+	
 	try {
 		const res = await fetch(URL_APP, {
 			method: "POST",
@@ -31,7 +54,7 @@ async function getJmlInstansi() {
 	}
 }
 
-// Render daftar dan progress
+// Render daftar dan progress instansi
 function renderInstBlmHadir(data, jmlInstansiHadir) {
 	const wrapper = document.getElementById("instansi-blm-hadir");
 	wrapper.innerHTML = '';
@@ -78,8 +101,8 @@ function renderInstBlmHadir(data, jmlInstansiHadir) {
 	const jmlInstBlmHadir = Object.values(data).reduce((sum, arr) => sum + arr.length, 0);
 	divJmlInst.innerHTML = `${jmlInstBlmHadir} dari ${jmlInstansi}`;
 
-	const bar = document.getElementById("progress-bar");
-	const text = document.getElementById("progress-text");
+	const bar = document.getElementById("progress-instansi-bar");
+	const text = document.getElementById("progress-instansi-text");
 	const persenInstHadir = ((jmlInstansiHadir / jmlInstansi) * 100).toFixed(1);
 
 	bar.style.width = `${persenInstHadir}%`;
@@ -87,6 +110,8 @@ function renderInstBlmHadir(data, jmlInstansiHadir) {
 }
 
 async function getInstBlmHadir() {
+	status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Mengambil Instansi yang Belum Hadir...</div></div>`;
+	
 	try {
 		const res = await fetch(URL_APP, {
 			method: "POST",
@@ -164,8 +189,18 @@ async function getJmlInstHadir() {
 }
 
 async function initDashboard() {
+	await initAcara();
 	jmlInstansi = await getJmlInstansi();
 	startRealtime();
+}
+
+async function initAcara() {
+	const acara = await setAcara(noAcara);
+	
+	document.getElementById("namaAcara").innerHTML = acara.nama;
+	document.getElementById("lokasi").innerHTML = acara.lokasi;
+	document.getElementById("tanggal").innerHTML = acara.tanggal;
+	document.getElementById("jam").innerHTML = acara.jam;
 }
 
 initDashboard();

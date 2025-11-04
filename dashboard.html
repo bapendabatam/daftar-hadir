@@ -11,11 +11,35 @@
 	<div id="status"></div>
 	<div id="judul">
 		<h1>Dashboard Daftar Hadir</h1>
+		<h2 id="namaAcara"></h2>
 	</div>
-	<div class="judul-progress">Progress Kehadiran Instansi/OPD</div>
-	<div id="progress">
-		<div id="progress-bar"></div>
-		<div id="progress-text"></div>
+	<div class="detail-wrapper">
+		<div class="detail-acara">
+			<div class="label">Lokasi:</div>
+			<div class="value" id="lokasi"></div>
+		</div>
+		<div class="detail-acara">
+			<div class="label">Tanggal:</div>
+			<div class="value" id="tanggal"></div>
+		</div>
+		<div class="detail-acara">
+			<div class="label">Jam Mulai:</div>
+			<div class="value" id="jam"></div>
+		</div>
+	</div>
+	<div class="wrapper-progress">
+		<div class="judul-progress">Progress Kehadiran Peserta</div>
+		<div id="progress-peserta" class="progress">
+			<div id="progress-peserta-bar" class="progress-bar"></div>
+			<div id="progress-peserta-text" class="progress-text"></div>
+		</div>
+	</div>
+	<div class="wrapper-progress">
+		<div class="judul-progress">Progress Kehadiran Instansi/OPD</div>
+		<div id="progress-instansi" class="progress">
+			<div id="progress-instansi-bar" class="progress-bar"></div>
+			<div id="progress-instansi-text" class="progress-text"></div>
+		</div>
 	</div>
 	<div id="wrapper">
 		<div class="card">
