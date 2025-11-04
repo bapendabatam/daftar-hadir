@@ -12,7 +12,6 @@ html, body {
 }
 
 #wrapper {
-	border: 1px solid red;
 	display: flex;
 	flex: 1;
 	flex-direction: column;
@@ -135,12 +134,18 @@ label {
 	font-size: 18px;
 }
 
+.judul-progress {
+	font-weight: bold;
+}
+
 #progress {
 	position: relative;
 	width: 100%;
 	background-color: #ddd;
 	overflow: hidden;
 	height: 24px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	border-radius: 4px;
 }
 
 #progress-bar {
@@ -162,6 +167,8 @@ label {
 }
 
 #diperbarui {
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	padding: 8px;
 }
 
 .box-input {
@@ -227,13 +234,59 @@ button {
 
 #instansi-blm-hadir {
 	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: center;
 }
 
 .grup-wrapper {
-	border: 1px solid black;
 	display: flex;
 	flex-direction: column;
+	padding: 10px;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	border-radius: 8px;
 }
 
 .grup-list {
+	counter-reset: num;
+	list-style: none;
+	padding: 0;
+}
+
+.grup-header {
+	font-weight: bold;
+	background-color: #1C6EA4;
+	color: #fff;
+	border-radius: 4px;
+	padding: 4px;
+	text-align: center;
+}
+
+.grup-list li {
+	padding: 4px;
+}
+
+.grup-list li:nth-child(odd) {
+	background-color: #fff;
+}
+
+.grup-list li:nth-child(even) {
+	background-color: #eee;
+}
+
+.grup-list li {
+	counter-increment: num;
+	padding-left: 1.8em;
+	position: relative;
+}
+
+.grup-list li::before {
+	content: counter(num) ".";
+	position: absolute;
+	left: 0;
+	background-color: #fff;
+}
+
+.grup-list li:nth-child(even)::before {
+	background-color: #eee;
 }
