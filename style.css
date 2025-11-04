@@ -3,12 +3,8 @@ html, body {
 	margin: 0;
 }
 
-#logo {
-	height: 80px;
-}
-
-#logo img {
-	height: 80px;
+.logo {
+	height: 50px;
 }
 
 .wrapper-progress {
@@ -61,14 +57,45 @@ html, body {
 }
 
 #judul {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: center;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+#judul-halaman {
+	flex: 1;
+	font-weight: bold;
+	font-size: 18px;
 	text-align: center;
+}
+
+#namaAcara {
+	font-weight: bold;
+	text-align: center;
+	font-size: 24px;
+	padding: 10px;
+	margin: 10px 0;
+	position: relative;
+}
+
+#namaAcara::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px; /* jarak dari teks */
+  transform: translateX(-50%);
+  width: 80%; /* panjang garis */
+  height: 4px;
+  background: linear-gradient(to right, transparent, #1C6EA4, transparent);
 }
 
 .detail-wrapper {
 	display: grid;
 	grid-template-columns: max-content 1fr; /* kolom kiri otomatis mengikuti label terpanjang */
-	gap: 4px 8px;
-	width: 100%;
+	width: calc(100% - 16px); /* Sama dengan padding wrapper 8px */
+	margin: 0 8px; /* jarak kiri-kanan agar sejajar dengan progress bar */
 }
 
 .detail-acara {
@@ -153,7 +180,7 @@ label {
 .progress {
 	position: relative;
 	width: 100%;
-	background-color: #ddd;
+	background-color: #ccc;
 	overflow: hidden;
 	height: 24px;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
@@ -257,6 +284,9 @@ button {
 	padding: 10px;
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 	border-radius: 8px;
+	max-width: 300px;
+	width: 100%;       /* tetap responsif di layar kecil */
+	box-sizing: border-box;
 }
 
 .grup-list {

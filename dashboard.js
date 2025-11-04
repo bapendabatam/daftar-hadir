@@ -4,6 +4,8 @@ const params = new URLSearchParams(window.location.search);
 const noAcara = params.get('acara'); // ambil noAcara dari URL
 
 const status = document.getElementById("status");
+const divJmlPeserta = document.getElementById("jml-peserta");
+const divProgressPeserta = document.getElementById("progress-peserta");
 const divJmlInst = document.getElementById("jml-instansi");
 const divProgressInstansi = document.getElementById("progress-instansi");
 
@@ -11,6 +13,8 @@ let currentVersion = null;
 const ol = document.getElementById("instansi-blm-hadir");
 ol.innerHTML = '';
 
+let jmlPeserta = 0;
+let jmlPesertaHadir = 0;
 let jmlInstansi = 0;
 let jmlInstansiHadir = 0;
 
@@ -52,6 +56,19 @@ async function getJmlInstansi() {
 		console.error(err);
 		return 0;
 	}
+}
+
+// Render progress peserta
+function renderPesertaBlmHadir(data, jmlPesertaHadir) {
+	// Hitung total peserta belum hadir
+	const jmlPesertaBlmHadir = jmlPeserta - jmlPesertaHadir;
+
+	const bar = document.getElementById("progress-peserta-bar");
+	const text = document.getElementById("progress-peserta-text");
+	const persenPesertaHadir = ((jmlPesertaHadir / jmlPeserta) * 100).toFixed(1);
+
+	bar.style.width = `${persenPesertaHadir}%`;
+	text.textContent = `${jmlPesertaHadir} / ${jmlPeserta} (${persenPesertaHadir}%)`;
 }
 
 // Render daftar dan progress instansi
@@ -135,8 +152,18 @@ async function startRealtime() {
 	// update render pertama kali
 	await updateRender(res);
 	
-	const updateTime = new Date().toLocaleString();
-	document.getElementById("diperbarui").innerHTML = `<span>Diperbarui: ${updateTime}</span>`;
+	const updateTime = new Date().toLocaleString("id-ID", {
+		timeZone: 'Asia/Jakarta',
+		day: "2-digit",
+		month: "2-digit",
+		year: "numeric",
+		hour: "2-digit",
+		minute: "2-digit",
+		second: "2-digit",
+		hour12: false
+	}).replace(",", "").replaceAll(".", ":");
+
+	document.getElementById("diperbarui").innerHTML = `<span>Diperbarui: ${updateTime} WIB</span>`;
 
 	// Hapus loading karena data sudah muncul
 	status.innerHTML = '';
@@ -169,8 +196,27 @@ async function waitLoop() {
 
 // Ambil ulang jumlah hadir setiap kali data berubah
 async function updateRender(res) {
-	const jmlHadir = await getJmlInstHadir();
-	renderInstBlmHadir(res.data, jmlHadir);
+	const jmlHadirPeserta = await getJmlPesertaHadir();
+	renderPesertaBlmHadir(res.data, jmlHadirPeserta);
+	
+	const jmlHadirInst = await getJmlInstHadir();
+	renderInstBlmHadir(res.data, jmlHadirInst);
+}
+
+async function getJmlPesertaHadir() {
+	try {
+		const res = await fetch(URL_APP, {
+			method: "POST",
+			headers: { "Content-Type": "text/plain;charset=utf-8" },
+			body: JSON.stringify({ action: "getJmlPesertaHadir", acara: noAcara })
+		});
+		const data = await res.json();
+		return data.totalHadir;
+		console.log(data.totalHadir);
+	} catch (err) {
+		console.error(err);
+		return 0;
+	}
 }
 
 async function getJmlInstHadir() {
@@ -196,6 +242,8 @@ async function initDashboard() {
 
 async function initAcara() {
 	const acara = await setAcara(noAcara);
+	
+	jmlPeserta = acara.jmlPeserta;
 	
 	document.getElementById("namaAcara").innerHTML = acara.nama;
 	document.getElementById("lokasi").innerHTML = acara.lokasi;
