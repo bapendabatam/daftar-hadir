@@ -266,13 +266,17 @@ form.addEventListener("submit", async function(e) {
 		const result = await res.json();
 	
 		if (result.status === "success") {
-			status.innerHTML = `<div class="success">Presensi Berhasil disimpan!</div>`;
+			status.innerHTML = `<div class="success"><div class="status-text">Presensi Berhasil disimpan!</div><i class="close fa-solid fa-circle-xmark" onclick="closeStatus()"></i></div>`;
 			form.reset();
 		} else {
 			status.innerHTML = `<div class="warning">${result.message}</div>`;
 		}
 	} catch (err) {
 		console.error(err);
-		status.innerHTML = `<div class="warning">Gagal menyimpan data: ${err.message}</div>`;
+		status.innerHTML = `<div class="warning"><div class="status-text">Gagal menyimpan data: ${err.message}</div><i class="close fa-solid fa-circle-xmark" onclick="closeStatus()"></i></div>`;
 	}
 });
+
+function closeStatus() {
+	status.innerHTML = "";
+}
