@@ -17,6 +17,10 @@ html, body {
 .close {
 	flex: 0 0 auto;
 	cursor: pointer;
+	color: #fff;
+	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+	border-radius: 50%;
+	width: 18px;
 }
 
 #wrapper {
@@ -108,7 +112,7 @@ html, body {
 	display: grid;
 	grid-template-columns: max-content 1fr; /* kolom kiri otomatis mengikuti label terpanjang */
 	width: calc(100% - 16px); /* Sama dengan padding wrapper 8px */
-	margin: 0 8px; /* jarak kiri-kanan agar sejajar dengan progress bar */
+	margin: 10px;
 }
 
 .detail-acara {
@@ -260,7 +264,6 @@ label {
 
 .dropdown-content {
 	display: none;
-	position: absolute;
 	background-color: #f6f6f6;
 	min-width: 100%;
 	border: 1px solid #ddd;
@@ -324,7 +327,6 @@ button:active {
 	box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 	border-radius: 8px;
 	max-width: 300px;
-	width: 100%;       /* tetap responsif di layar kecil */
 	box-sizing: border-box;
 }
 
