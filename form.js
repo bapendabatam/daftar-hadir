@@ -248,7 +248,8 @@ form.addEventListener("submit", async function(e) {
 		instansi: form.instansi.value,
 		jabatan: form.jabatan.value,
 		lat: usrLat,
-		lng: usrLng
+		lng: usrLng,
+		deviceId: getDeviceId()
 	};
 
 	status.innerHTML = `<div class="loading"><div class="loading-icon"></div><div>Menyimpan Data Presensi...</div></div>`;
@@ -279,4 +280,15 @@ form.addEventListener("submit", async function(e) {
 
 function closeStatus() {
 	status.innerHTML = "";
+}
+
+function getDeviceId() {
+	let deviceId = localStorage.getItem("deviceId");
+	
+	if (!deviceId) {
+		deviceId = crypto.randomUUID();
+		localStorage.setItem("deviceId", deviceId);
+	}
+	
+	return deviceId;
 }
